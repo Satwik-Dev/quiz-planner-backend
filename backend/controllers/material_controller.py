@@ -3,38 +3,22 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from bson.objectid import ObjectId
 import pymongo
 from datetime import datetime
+from config import Config
 
 # Initialize blueprint
 material_bp = Blueprint('material', __name__)
 
-# MongoDB connection
-client = pymongo.MongoClient('mongodb://localhost:27017/')
+# MongoDB connection - use config instead of hardcoded
+client = pymongo.MongoClient(Config.MONGO_URI)
 db = client.quiz_planner
-
-# Add this function to handle CORS preflight requests
-@material_bp.route('/', methods=['OPTIONS'])
-def materials_options():
-    response = make_response()
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-    return response
 
 @material_bp.route('/', methods=['POST'])
 @jwt_required()
 def create_material():
     """Create a new study material"""
-    # Print debugging info
-    print("\n--- CREATE MATERIAL REQUEST ---")
-    print("Headers:", dict(request.headers))
-    print("Authorization:", request.headers.get('Authorization'))
-    
     try:
         user_id = get_jwt_identity()
-        print("User ID from JWT:", user_id)
-        
         data = request.get_json()
-        print("Request data:", data)
         
         # Validate input
         if not data or 'title' not in data or 'content' not in data:
@@ -57,18 +41,14 @@ def create_material():
         }
         
         material_id = db.study_materials.insert_one(material).inserted_id
-        print("Material created with ID:", material_id)
         
-        # Add CORS headers to response
-        response = jsonify({
+        return jsonify({
             "message": "Study material created successfully",
             "material": {
                 "id": str(material_id),
                 "title": title
             }
-        })
-        
-        return response, 201
+        }), 201
         
     except Exception as e:
         print("Error in create_material:", str(e))

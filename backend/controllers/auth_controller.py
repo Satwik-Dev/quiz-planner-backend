@@ -5,12 +5,13 @@ from datetime import datetime
 from bson.objectid import ObjectId
 import pymongo
 import re
+from config import Config
 
 # Initialize blueprint
 auth_bp = Blueprint('auth', __name__)
 
-# MongoDB connection
-client = pymongo.MongoClient('mongodb://localhost:27017/')
+# MongoDB connection - use config instead of hardcoded
+client = pymongo.MongoClient(Config.MONGO_URI)
 db = client.quiz_planner
 
 @auth_bp.route('/register', methods=['POST'])

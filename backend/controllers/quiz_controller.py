@@ -1,7 +1,7 @@
 import os
 import sys
 from pathlib import Path
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, Config, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from bson.objectid import ObjectId
 import pymongo
@@ -10,8 +10,8 @@ from datetime import datetime
 # Initialize blueprint
 quiz_bp = Blueprint('quiz', __name__)
 
-# MongoDB connection
-client = pymongo.MongoClient('mongodb://localhost:27017/')
+# MongoDB connection - use config instead of hardcoded
+client = pymongo.MongoClient(Config.MONGO_URI)
 db = client.quiz_planner
 
 # Add parent directory to path to ensure imports work properly
