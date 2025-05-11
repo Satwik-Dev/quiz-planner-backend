@@ -1,11 +1,12 @@
 import os
 import sys
 from pathlib import Path
-from flask import Blueprint, Config, request, jsonify
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from bson.objectid import ObjectId
 import pymongo
 from datetime import datetime
+from config import Config  # Fix: Import from your config module, not from Flask
 
 # Initialize blueprint
 quiz_bp = Blueprint('quiz', __name__)
